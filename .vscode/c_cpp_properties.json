@@ -9,8 +9,7 @@
             "name": "PlatformIO",
             "includePath": [
                 "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/nodes",
-                "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/Arduino_MFRC522v2/src",
-                "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
+                "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/MFRC522/src",
                 "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/autowp-mcp2515",
                 "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
                 "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/nodes/node_payment/include",
@@ -242,14 +241,14 @@
                 "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
+                "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
                     "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/nodes",
-                    "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/Arduino_MFRC522v2/src",
-                    "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
+                    "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/MFRC522/src",
                     "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/.pio/libdeps/node_payment/autowp-mcp2515",
                     "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
                     "C:/Users/maxbu/Documents/Fontys/Technology/Semester 3/Take 2/Group project/parkify/nodes/node_payment/include",
@@ -481,6 +480,7 @@
                     "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
+                    "C:/Users/maxbu/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     ""
                 ]
             },

@@ -5,11 +5,7 @@
 #include <string>
 #include "can_config.h"
 #include "math.h"
-#include <MFRC522v2.h>
-#include <MFRC522DriverSPI.h>
-//#include <MFRC522DriverI2C.h>
-#include <MFRC522DriverPinSimple.h>
-#include <MFRC522Debug.h>
+#include <MFRC522.h>
 
 using namespace std;
 
@@ -22,11 +18,7 @@ struct can_frame rxMsg;
 
 
 MCP2515 mcp2515(CAN_SPI_CS_PIN);
-MFRC522DriverPinSimple ss_pin(RFID_SS);
-
-MFRC522DriverSPI driver{ss_pin}; // Create SPI driver
-//MFRC522DriverI2C driver{};     // Create I2C driver
-MFRC522 rfid{driver}; 
+MFRC522 rfid(RFID_SS, RFID_RST); 
 
 
 std::map<int, pair<string, bool>> cars;
@@ -54,7 +46,6 @@ void setup() {
   delay(100);
   
   Serial.println("RFID reader initialized");
-  Serial.print("Firmware version: ");
   //rfid.PCD_DumpVersionToSerial();
   
   //generateMap();
@@ -88,6 +79,18 @@ void loop() {
       Serial.println(received);
     }
   }
+
+  if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+        Serial.println("RFID tag detected!");
+
+      for (byte i = 0; i < rfid.uid.size; i++) {
+        Serial.print(rfid.uid.uidByte[i] < 0x10 ? "0" : "");
+        Serial.print(rfid.uid.uidByte[i], HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+      rfid.PICC_HaltA();
+    }
 }
 void readRFIDCard() {
   // Check if a new card is present
