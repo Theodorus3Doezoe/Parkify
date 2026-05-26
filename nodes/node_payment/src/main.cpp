@@ -7,28 +7,21 @@
 #include "math.h"
 #include <MFRC522.h>
 
-using namespace std;
-
 #define RFID_SS 21
 #define RFID_RST 22
 
+using namespace std;
 
 struct can_frame txMsg;
 struct can_frame rxMsg;
 
-
 MCP2515 mcp2515(CAN_SPI_CS_PIN);
 MFRC522 rfid(RFID_SS, RFID_RST); 
 
-
-std::map<int, pair<string, bool>> cars;
+std::map<int, string> cars;
 int carCount = 0;
 
 string plate[] = {"C431WD","DF54WD","HJ078T","VBNH31","15TFHE"};
-
-void generateMap();
-void readRFIDCard();
-String getCardUID();
 
 void setup() {
 
@@ -45,13 +38,8 @@ void setup() {
   rfid.PCD_Init();
   delay(100);
   
-  Serial.println("RFID reader initialized");
-  //rfid.PCD_DumpVersionToSerial();
-  
-  //generateMap();
 
   const char* text = "MDKF43";
-  //readRFIDCard();
   
   txMsg.can_id = 4;
   txMsg.can_dlc = strlen(text);
@@ -63,6 +51,8 @@ void setup() {
 }
 
 void loop() {
+
+  //Code to test received CAN message
   char received[9];
   if(mcp2515.readMessage(&rxMsg) == MCP2515::ERROR_OK)
   {
@@ -77,9 +67,21 @@ void loop() {
 
       Serial.print("Received: ");
       Serial.println(received);
+
+      carCount++;
+      cars.insert({carCount, received});
+
+      //Testing if it's put in the map correctly
+      char getS[9];
+      strncpy(getS, cars.at(carCount).c_str(), sizeof(getS));
+      getS[sizeof(getS) - 1] = '\0';
+
+      Serial.println(getS);
     }
   }
 
+
+  //Test code for a RFID scanner (still need to implement paying logic)
   if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
         Serial.println("RFID tag detected!");
 
@@ -91,48 +93,4 @@ void loop() {
       Serial.println();
       rfid.PICC_HaltA();
     }
-}
-void readRFIDCard() {
-  // Check if a new card is present
-  if (!rfid.PICC_IsNewCardPresent()) {
-    return;
-  }
-  
-  // Check if we can read the card serial
-  if (!rfid.PICC_ReadCardSerial()) {
-    return;
-  }
-  
-  // Get the card UID
-  String cardUID = getCardUID();
-  Serial.print("Card UID: ");
-  Serial.println(cardUID);
-  
-  // Halt PICC (end the card reading)
-  rfid.PICC_HaltA();
-  
-  // Stop encryption on PCD
-  rfid.PCD_StopCrypto1();
-}
-
-String getCardUID() {
-  String uid = "";
-  for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] < 0x10) {
-      uid += "0";
-    }
-    uid += String(rfid.uid.uidByte[i], HEX);
-  }
-  uid.toUpperCase();
-  return uid;
-}
-
-void generateMap()
-{
-  Serial.println("GENERATE MAP!");
-  for (int i = 0; i <= 4; i++)
-  {
-    cars.insert({i, {plate[i], false}});
-    carCount++;
-  }
 }
