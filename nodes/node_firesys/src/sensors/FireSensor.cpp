@@ -2,6 +2,4 @@
 
 FireSensor::FireSensor(int id) : _sensorID(id) {}
 
-bool FireSensor::readSignal() {
-    return false;
-}
+bool FireSensor::readSignal() { return false; }

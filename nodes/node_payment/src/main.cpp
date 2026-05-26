@@ -1,8 +1,3 @@
-#include <Arduino.h>
-#include <SPI.h>
-#include <mcp2515.h>
-#include <map>
-#include <string>
 #include "can_config.h"
 #include "math.h"
 #include <MFRC522.h>
@@ -21,19 +16,19 @@ MFRC522 rfid(RFID_SS, RFID_RST);
 std::map<int, string> cars;
 int carCount = 0;
 
-string plate[] = {"C431WD","DF54WD","HJ078T","VBNH31","15TFHE"};
+string plate[] = {"C431WD", "DF54WD", "HJ078T", "VBNH31", "15TFHE"};
 
 void setup() {
 
   Serial.begin(115200);
   Serial.println("SETUP!");
   SPI.begin();
-  
+
   // Initialize CAN
   mcp2515.reset();
   mcp2515.setBitrate(CAN_BITRATE, CAN_CLOCK_SPEED);
   mcp2515.setLoopbackMode();
-  
+
   // Initialize RFID reader
   rfid.PCD_Init();
   delay(100);
@@ -54,12 +49,10 @@ void loop() {
 
   //Code to test received CAN message
   char received[9];
-  if(mcp2515.readMessage(&rxMsg) == MCP2515::ERROR_OK)
-  {
+  if (mcp2515.readMessage(&rxMsg) == MCP2515::ERROR_OK) {
     Serial.println("LOOP!");
     Serial.println("Received");
-    if(rxMsg.can_id == 4)
-    {
+    if (rxMsg.can_id == 4) {
       char received[9];
       Serial.println("LOOP!");
       memcpy(received, rxMsg.data, rxMsg.can_dlc);
