@@ -1,6 +1,6 @@
-#include "IStatusIndicator.hpp"
-#include "IOccupancySensor.hpp"
-#include "ICommunication.hpp"
+#include "IStatusIndicator.h"
+#include "IOccupancySensor.h"
+#include "ICommunication.h"
 
 class mockIndicator : public IStatusIndicator {
 private:
@@ -9,6 +9,7 @@ private:
 public:
     mockIndicator();
     void setLightState(indicatorState state) override;
+    void update() override;
 };
 
 class mockSensor : public IOccupancySensor {
@@ -28,5 +29,5 @@ public:
     mockCommunication();
     void set_message(uint8_t id, uint8_t dlc, uint8_t data[8]);
     bool tx_message(message_frame msg) override;
-    message_frame rx_message() override;
+    bool rx_message(message_frame* msg) override;
 };

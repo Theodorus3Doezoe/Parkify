@@ -1,8 +1,10 @@
-#include "mock.hpp"
+#include "include/mock.h"
 
 mockIndicator::mockIndicator() {}
 
 void mockIndicator::setLightState(indicatorState state) { mockState = state; }
+
+void mockIndicator::update() {}
 
 
 mockSensor::mockSensor(bool state) : mockState(state) {}
@@ -26,16 +28,18 @@ void mockCommunication::set_message(uint8_t id, uint8_t dlc, uint8_t data[8])
 
 bool mockCommunication::tx_message(message_frame msg) { return true; }
 
-message_frame mockCommunication::rx_message()
+bool mockCommunication::rx_message(message_frame* msg)
 {
-    message_frame msg = stored_msg;
+    if (stored_msg.id > 0) {
+        *msg = stored_msg;
+        stored_msg.id = 0;
+        stored_msg.data_length = 0;
+        for (uint8_t i = 0; i < 8; i++) {
+            stored_msg.data[i] = 0;
+        }
 
-    stored_msg.id = 0;
-    stored_msg.data_length = 0;
-    
-    for (uint8_t i = 0; i < 8; i++) {
-        stored_msg.data[i] = 0;
+        return true;
     }
 
-    return stored_msg;
+    return false;
 }

@@ -1,0 +1,96 @@
+@startuml node_parking
+package "Parking node" {
+interface iCommunication
+{
+    +~ICommunication()
+    +tx_message(message_frame msg) : bool
+    +rx_message() : message_frame
+}
+
+interface IOccupancySensor
+{
+    +~IOccupancySensor()
+    +sensorTriggered() : bool
+}
+
+interface IStatusIndicator
+{
+    +~IStatusIndicator()
+    +setLightState(indicatorState state) : void
+}
+
+class node 
+{
+    -spots[4] : spot
+    -com : ICommunication*
+    -getBestSpot : uint16_t
+    -getMessages : message_frame
+    -updateReservations : void
+
+    +node(id : int)
+    +run() : void
+}
+
+class spot
+{
+    -sensor : IOccupancySensor*
+    -indicator : IStatusIndicator*
+    -id : uint16_t
+    -priority : uint16_t
+    -occupied : bool
+    -reserved : bool
+    -reservationExpiration : uint16_t
+    +spot(initId : uint16_t, initPrio : uint16_t,
+        initSensor : IOccupancySensor*, initIndicator : IStatusIndicator*);
+    +update() : void
+    +getOccupancy() : bool
+    +getId() : uint16_t
+    +getPriority() : uint16_t
+    +setIndicator(state : indicatorState) : void
+    +setReservation(set : bool) : void
+}
+
+class canbus 
+{
+    -Rx : can_frame;
+    -Tx : can_frame;
+    -mcp2515 : MCP2515;
+>
+    +canbus(uint8_t cs_pin);
+    +tx_message(message_frame) : bool
+    +rx_message() : message_frame
+}
+
+class ledIndicator 
+{
+    -state : indicatorState;
+    -green_led : uint8_t;
+    -blue_led : uint8_t;
+    -red_led : uint8_t;
+
+    +ledIndicator(green_pin : uint8_t, blue_pin : uint8_t, red_pin : uint8_t);
+    +setLightState(set : indicatorState) : void
+}
+
+class sonarsensor 
+{
+    -trigger_pin: uint8_t;
+    -echo_pin : uint8_t;
+    -trigger_distance : uint16_t;
+
+    +sonarsensor(trig_pin : uint8_t, ech_pin : uint8_t, trig_distance : uint16_t);
+    +sensorTriggered() : bool
+}
+
+node --> spot
+
+spot --> iCommunication
+spot --> IOccupancySensor
+spot --> IStatusIndicator
+
+iCommunication <|-- canbus
+IOccupancySensor <|-- sonarsensor
+IStatusIndicator <|-- ledIndicator
+
+}
+@enduml

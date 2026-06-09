@@ -1,4 +1,4 @@
-#include "canbus.hpp"
+#include "include/canbus.h"
 
 canbus::canbus(uint8_t cs_pin) : mcp2515(cs_pin)
 {
@@ -7,17 +7,17 @@ canbus::canbus(uint8_t cs_pin) : mcp2515(cs_pin)
     mcp2515.setNormalMode();
 }
 
-message_frame canbus::rx_message()
+bool canbus::rx_message(message_frame* msg)
 {
-    message_frame msg;
     if (mcp2515.readMessage(&Rx) == MCP2515::ERROR_OK) {
-        msg.id = Rx.can_id;
-        msg.data_length = Rx.can_dlc;
+        msg->id = Rx.can_id;
+        msg->data_length = Rx.can_dlc;
         for (uint8_t i = 0; i < Rx.can_dlc; i++) {
-            msg.data[i] = Rx.data[i];
+            msg->data[i] = Rx.data[i];
         }
+        return true;
     }
-    return msg;
+    return false;
 }
 
 bool canbus::tx_message(message_frame msg)
