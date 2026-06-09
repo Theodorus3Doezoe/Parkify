@@ -1,89 +1,61 @@
 #include "can_config.h"
 #include "math.h"
-#include <MFRC522.h>
 
-#define RFID_SS 21
-#define RFID_RST 22
+#include <map>
+#include "node_payment/include/Headers/RFIDScanner.h"
+#include "../lib/common/ILicensePlateScanner.h"
+#include "node_payment/include/Headers/PaymentController.h"
 
-using namespace std;
+#define SCK 18
+#define SIMO 19
+#define MOSI 23
+
+
 
 struct can_frame txMsg;
 struct can_frame rxMsg;
 
 MCP2515 mcp2515(CAN_SPI_CS_PIN);
-MFRC522 rfid(RFID_SS, RFID_RST); 
+MFRC522 rfid(RFID_SS, RFID_RST);
 
-std::map<int, string> cars;
+std::map<int, std::string> cars;
 int carCount = 0;
 
-string plate[] = {"C431WD", "DF54WD", "HJ078T", "VBNH31", "15TFHE"};
+std::string plate[] = {"C431WD", "DF54WD", "HJ078T", "VBNH31", "15TFHE"};
+
+ILicensePlateScanner* scanner;
+PaymentController* paymentController;
 
 void setup() {
-
   Serial.begin(115200);
-  Serial.println("SETUP!");
-  SPI.begin();
+  SPI.begin(SCK, SIMO, MOSI);
 
+  pinMode(CAN_SPI_CS_PIN, OUTPUT);
+  pinMode(RFID_SS, OUTPUT);
+  pinMode(RFID_RST, OUTPUT);
+
+  digitalWrite(CAN_SPI_CS_PIN, HIGH);
+  digitalWrite(RFID_SS, HIGH);
+  digitalWrite(RFID_RST, HIGH);
+  
   // Initialize CAN
   mcp2515.reset();
   mcp2515.setBitrate(CAN_BITRATE, CAN_CLOCK_SPEED);
-  mcp2515.setLoopbackMode();
-
+  mcp2515.setNormalMode();
+  
   // Initialize RFID reader
+  scanner = new RFIDScanner(&rfid);
   rfid.PCD_Init();
   delay(100);
   
+  digitalWrite(CAN_SPI_CS_PIN, HIGH);
 
-  const char* text = "MDKF43";
-  
-  txMsg.can_id = 4;
-  txMsg.can_dlc = strlen(text);
-
-  memcpy(txMsg.data, text, txMsg.can_dlc);
-
-  mcp2515.sendMessage(&txMsg);
-  Serial.println("SETUP!");
+  paymentController = new PaymentController(scanner, &mcp2515);
 }
 
 void loop() {
 
-  //Code to test received CAN message
-  char received[9];
-  if (mcp2515.readMessage(&rxMsg) == MCP2515::ERROR_OK) {
-    Serial.println("LOOP!");
-    Serial.println("Received");
-    if (rxMsg.can_id == 4) {
-      char received[9];
-      Serial.println("LOOP!");
-      memcpy(received, rxMsg.data, rxMsg.can_dlc);
-      received[rxMsg.can_dlc] = '\0';
+  paymentController->Run();
 
-      Serial.print("Received: ");
-      Serial.println(received);
-
-      carCount++;
-      cars.insert({carCount, received});
-
-      //Testing if it's put in the map correctly
-      char getS[9];
-      strncpy(getS, cars.at(carCount).c_str(), sizeof(getS));
-      getS[sizeof(getS) - 1] = '\0';
-
-      Serial.println(getS);
-    }
-  }
-
-
-  //Test code for a RFID scanner (still need to implement paying logic)
-  if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
-        Serial.println("RFID tag detected!");
-
-      for (byte i = 0; i < rfid.uid.size; i++) {
-        Serial.print(rfid.uid.uidByte[i] < 0x10 ? "0" : "");
-        Serial.print(rfid.uid.uidByte[i], HEX);
-        Serial.print(" ");
-      }
-      Serial.println();
-      rfid.PICC_HaltA();
-    }
+  delay(50);
 }
