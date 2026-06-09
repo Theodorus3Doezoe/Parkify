@@ -9,9 +9,10 @@
             "name": "PlatformIO",
             "includePath": [
                 "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/nodes",
-                "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/lib/common",
+                "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/.pio/libdeps/node_gate/MFRC522/src",
                 "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/.pio/libdeps/node_gate/autowp-mcp2515",
                 "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
+                "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/lib/common",
                 "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/nodes/node_gate/include",
                 "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
                 "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
@@ -247,9 +248,10 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
                     "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/nodes",
-                    "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/lib/common",
+                    "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/.pio/libdeps/node_gate/MFRC522/src",
                     "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/.pio/libdeps/node_gate/autowp-mcp2515",
                     "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
+                    "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/lib/common",
                     "C:/Users/Julian/Desktop/School_Dingen/Semester3/IndustryProject/Codes/ParkifyRepo/nodes/node_gate/include",
                     "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include",
                     "C:/Users/Julian/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
@@ -503,6 +505,7 @@
                 ""
             ],
             "cStandard": "gnu99",
+            "cppStandard": "gnu++20",
             "compilerPath": "C:/Users/Julian/.platformio/packages/toolchain-xtensa-esp32/bin/xtensa-esp32-elf-gcc.exe",
             "compilerArgs": [
                 "-mlongcalls",
