@@ -12,5 +12,5 @@ class ICommunication
 public:
     virtual ~ICommunication() = default;
     virtual bool tx_message(message_frame msg) = 0;
-    virtual message_frame rx_message() = 0;
+    virtual bool rx_message(message_frame* msg) = 0;
 };

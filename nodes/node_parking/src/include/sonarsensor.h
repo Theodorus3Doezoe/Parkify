@@ -1,4 +1,4 @@
-#include "IOccupancySensor.hpp"
+#include "IOccupancySensor.h"
 #include <stdint.h>
 #include <Arduino.h>
 

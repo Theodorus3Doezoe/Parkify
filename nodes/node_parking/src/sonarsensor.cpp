@@ -1,4 +1,4 @@
-#include "sonarsensor.hpp"
+#include "include/sonarsensor.h"
 
 sonarsensor::sonarsensor(uint8_t trig_pin, uint8_t ech_pin, uint16_t trig_distance) : trigger_pin(trig_pin), echo_pin(ech_pin), trigger_distance(trig_distance)
 {

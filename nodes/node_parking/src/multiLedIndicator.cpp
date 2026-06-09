@@ -1,16 +1,22 @@
-#include "ledIndicator.hpp"
+#include "include/multiLedIndicator.h"
 
-ledIndicator::ledIndicator(uint8_t green_pin, uint8_t blue_pin, uint8_t red_pin) : green_led(green_pin), blue_led(blue_pin), red_led(red_pin)
+multiLedIndicator::multiLedIndicator(uint8_t green_pin, uint8_t blue_pin, uint8_t red_pin) : green_led(green_pin), blue_led(blue_pin), red_led(red_pin)
 {
     pinMode(green_led, OUTPUT);
     pinMode(blue_led, OUTPUT);
     pinMode(red_led, OUTPUT);
 }
 
-void ledIndicator::setLightState(indicatorState set)
+void multiLedIndicator::setLightState(indicatorState set)
 {
-    if (state != set) {
-        state = set;
+    state = set;
+    update();
+}
+
+void multiLedIndicator::update()
+{
+    if (state != prevState) {
+        prevState = state;
 
         switch (state)
         {
