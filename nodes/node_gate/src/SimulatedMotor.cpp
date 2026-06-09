@@ -1,4 +1,4 @@
-#include "../include/SimulatedMotor.hpp"
+#include "../include/SimulatedMotor.h"
 
 void SimulatedMotor::open()
 {

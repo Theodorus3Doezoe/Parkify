@@ -1,8 +1,10 @@
 #include <Arduino.h>
-#include "../include/CanCommunication.hpp"
-#include "../include/GateController.hpp"
-#include "../include/SimulatedMotor.hpp"
-#include "../include/SimulatedLicencePlateScanner.hpp"
+#include "../include/CanCommunication.h"
+#include "../include/GateController.h"
+#include "../include/SimulatedMotor.h"
+#include "../include/SimulatedLicencePlateScanner.h"
+#include "../include/RFIDScanner.h"
+#include "../include/SPI_Setup.h"
 
 // =====================================================
 // KEEP YOUR GLOBALS EXACTLY
@@ -19,10 +21,13 @@ struct can_frame canMsg;
 // SYSTEM OBJECTS
 // =====================================================
 
+SPI_Setup SPIsetup;
+
 GateMode mode = ENTRY;
 CanCommunication can;
 SimulatedMotor motor;
-SimulatedLicencePlateScanner scanner;
+MFRC522 rfid(RFID_SS, RFID_RST);
+RFIDScanner scanner(&rfid);
 
 GateController gate(can, motor, scanner, mode);
 
@@ -41,7 +46,7 @@ void setup() {
     {
         Serial.println("STARTING EXIT GATE");
     };
-    can.begin();
+    SPIsetup.begin(mode);
     gate.begin();
 }
 

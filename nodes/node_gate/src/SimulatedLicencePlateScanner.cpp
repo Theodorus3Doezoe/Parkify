@@ -1,4 +1,4 @@
-#include "../include/SimulatedLicencePlateScanner.hpp"
+#include "../include/SimulatedLicencePlateScanner.h"
 
 String SimulatedLicencePlateScanner::scan()
 {

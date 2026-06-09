@@ -1,4 +1,4 @@
-#include "../include/GateController.hpp"
+#include "../include/GateController.h"
 
 GateController::GateController(CanCommunication &can, IMotor &motor, ILicencePlateScanner &scanner, GateMode mode)
 : can(can), motor(motor), scanner(scanner), mode(mode) {}
@@ -147,21 +147,19 @@ void GateController::loop() {
 void GateController::entrySimulation() {
 
     if (mode == EXIT) return;
+    
+    String registration = scanner.scan();
 
-    static unsigned long lastEntry = 0;
-
-    if (millis() - lastEntry > 2500) {
+    if (registration.length() > 0) {
 
         int parkingID = random(1, 99);
 
         sendEntryNotice(parkingID);
         delay(100);
 
-        sendRegistration("RNDF95");
+        sendRegistration(registration);
 
         motor.open();
-
-        lastEntry = millis();
     }
 }
 
