@@ -1,7 +1,7 @@
 # UI Node UML Diagram
 
 ```plantuml
-@startuml Parkify_UI_FireSystem
+@startuml Parkify_UI
 ' ─────────────────────────────────────────
 package "User Interface" {
     interface IInputReader {
