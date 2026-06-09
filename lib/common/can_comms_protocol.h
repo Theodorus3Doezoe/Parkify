@@ -10,5 +10,8 @@ enum CAN_MessageID {
     BR_STATE = 7,
     TX_VALIDATION = 8,
     TX_VALIDATED_REG = 9,
-    BR_EXIT = 10
+    BR_EXIT = 10,
+    REQ_SESSION_DATA = 11,
+    TX_SESSION_DATA = 12,
+    CMD_GATE_CONTROL = 13
 };

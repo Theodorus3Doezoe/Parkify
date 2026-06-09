@@ -35,10 +35,13 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  Serial.println("UI Node Ready.");
+  Serial.println("Initializing UI Node...");
   setupCanBus();
 
-  Serial.println("\nCommands: [O]pen, [C]lose, [E]mergency, [D]ashboard\n");
+  // Clear screen and hide cursor for TUI
+  Serial.print("\033[2J\033[H");
+
+  display.showState(SystemState::CLOSED);
 }
 
 void loop() { uiController.run(); }

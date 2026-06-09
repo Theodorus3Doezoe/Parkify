@@ -2,7 +2,8 @@
 
 String ConsoleInputReader::readInput() {
     if (Serial.available()) {
-        return Serial.readStringUntil('\n');
+        char c = (char)Serial.read();
+        return String(c);
     }
     return "";
 }
