@@ -4,8 +4,6 @@
 #include "../include/GateController.h"
 
 #include <SPI.h>
-#include <mcp2515.h>
-#include <MFRC522.h>
 
 // SPI pins
 #define CAN_SCK  18
@@ -13,10 +11,6 @@
 #define CAN_MOSI 23
 
 #define CAN_CS   5
-
-// external objects (assumed defined somewhere)
-extern MCP2515 mcp2515;
-extern MFRC522 rfid;
 
 void SPI_Setup::begin(GateMode gateMode)
 {

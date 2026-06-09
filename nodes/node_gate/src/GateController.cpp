@@ -1,4 +1,7 @@
 #include "../include/GateController.h"
+#include "database/database_client.h"
+
+DatabaseClient dbClient(mcp2515);
 
 GateController::GateController(CanCommunication &can, IMotor &motor, ILicencePlateScanner &scanner, GateMode mode)
 : can(can), motor(motor), scanner(scanner), mode(mode) {}
@@ -100,6 +103,33 @@ void GateController::handleValidatedReg(struct can_frame &frame) {
     Serial.println(validatedReg);
 }
 
+void GateController::handleParkingID(struct can_frame &frame)
+{
+    if (frame.can_dlc < 2) return;
+
+    uint16_t value =
+        frame.data[0] |
+        (frame.data[1] << 8);
+
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        parkingID = value;
+        parkingID_ready = true;
+    }
+
+    cv.notify_one();
+}
+
+bool GateController::waitForParkingID(int timeout_ms)
+{
+    std::unique_lock<std::mutex> lock(mtx);
+
+    return cv.wait_for(lock,
+        std::chrono::milliseconds(timeout_ms),
+        [&] { return parkingID_ready; }
+    );
+}
+
 // =====================================================
 // MESSAGE ROUTER
 // =====================================================
@@ -118,6 +148,10 @@ void GateController::processCanMessage(struct can_frame &frame) {
 
         case TX_VALIDATED_REG:
             if (mode == EXIT) handleValidatedReg(frame);
+            break;
+
+        case TX_SESSION_DATA:
+            if (mode == ENTRY) handleParkingID(frame);
             break;
 
         case BR_STATE:
@@ -144,17 +178,33 @@ void GateController::loop() {
 // SIMULATION (ENTRY)
 // =====================================================
 
-void GateController::entrySimulation() {
-
+void GateController::entrySimulation()
+{
     if (mode == EXIT) return;
-    
+
     String registration = scanner.scan();
 
-    if (registration.length() > 0) {
+    if (registration.length() > 0)
+    {
+        parkingID_ready = false;   // reset before request
 
-        int parkingID = random(1, 99);
+        dbClient.requestLowestId();
+
+        struct can_frame frame;
+        can.read(frame);
+
+        if(frame.can_id == TX_SESSION_DATA) {
+            if(frame.data[0] == 0xFE) {
+                parkingID = 0;
+                memcpy(&parkingID, &frame.data[1], 2);
+            }
+        }
+
+        Serial.print("Parking ID: ");
+        Serial.println(parkingID);
 
         sendEntryNotice(parkingID);
+
         delay(100);
 
         sendRegistration(registration);

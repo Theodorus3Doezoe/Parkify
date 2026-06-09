@@ -5,6 +5,10 @@
 #include "ILicencePlateScanner.h"
 #include "can_comms_protocol.h"
 #include "can_config.h"
+#include <mcp2515.h>
+#include <MFRC522.h>
+#include <mutex>
+#include <condition_variable>
 
 class IMotor;
 class ILicencePlateScanner;
@@ -15,6 +19,9 @@ enum GateMode {
 };
 
 extern SystemState currentState;
+
+extern MCP2515 mcp2515;
+extern MFRC522 rfid;
 
 extern int validatedParkingID;
 extern String validatedReg;
@@ -39,6 +46,9 @@ private:
     void handleState(struct can_frame &frame);
     void handleValidation(struct can_frame &frame);
     void handleValidatedReg(struct can_frame &frame);
+    void handleParkingID(struct can_frame &frame);
+
+    bool waitForParkingID(int timeout_ms);
 
     void sendOccupancyRequest();
     void sendEntryNotice(int parkingID);
@@ -47,4 +57,11 @@ private:
 
     void entrySimulation();
     void exitDebug();
+
+    uint16_t parkingID;
+
+    std::mutex mtx;
+    std::condition_variable cv;
+
+    bool parkingID_ready = false;
 };
