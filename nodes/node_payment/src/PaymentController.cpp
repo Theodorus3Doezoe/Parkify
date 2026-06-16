@@ -34,7 +34,7 @@ void PaymentController::Run()
 
 
 
-    
+
     // Sending licence plate over CAN
     length = license.length();
     if (length > 8) length = 8; // ensure fits in CAN data field
@@ -42,4 +42,11 @@ void PaymentController::Run()
     txMsg.can_dlc = length;
     memcpy(txMsg.data, license.c_str(), length);
     canBus->sendMessage(&txMsg);
+
+    delay(10);
+
+    if(!dbClient.isPaid(parkingID));
+    {
+        dbClient.setSessionPaid(parkingID);
+    }
 }
