@@ -10,10 +10,13 @@ public:
 private:
     MCP2515& _mcp;
   Database &_db;
+  uint16_t _lastNoticedId = 0;
 
+  void handleEntryNotice(const struct can_frame &frame);
   void handleEntryRegistration(const struct can_frame &frame);
   void handleValidation(const struct can_frame &frame);
   void handleSessionRequest(const struct can_frame &frame);
+  void handleIdByPlateRequest(const struct can_frame &frame);
 
   void sendSessionData(uint16_t id);
 

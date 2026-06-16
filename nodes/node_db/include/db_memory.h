@@ -32,6 +32,7 @@ public:
 
   void add(uint16_t id, const Data &data);
   std::optional<Data> get(uint16_t id);
+  std::optional<uint16_t> findIdByPlate(const char *plate);
   bool exists(uint16_t id);
   bool remove(uint16_t id);
   uint16_t getLowestId();

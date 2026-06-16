@@ -8,15 +8,15 @@ static uint16_t lastUsedId = 0;
 
 void displayMenu() {
     Serial.println("\n--- [DB NODE TEST MENU] ---");
-    Serial.println("1. Simuleer Ingang (Nieuwe auto registratie)");
-    Serial.println("2. Simuleer Betaling (Valideer sessie)");
-    Serial.println("3. Opvragen Sessie Data (Specifiek ID)");
-    Serial.println("4. Opvragen Laagste Vrije ID");
-    Serial.println("5. Database Dump (Overzicht in geheugen)");
-    Serial.println("6. Forceer Save naar Flash");
-    Serial.println("7. Wis Database (Flash + Geheugen)");
-    Serial.println("M. Toon dit menu opnieuw");
-    Serial.print("Keuze: ");
+    Serial.println("1. Simulate Entry (Register Car)");
+    Serial.println("2. Simulate Payment (Validate ID)");
+    Serial.println("3. Request Session (Get Data)");
+    Serial.println("4. Request Lowest ID");
+    Serial.println("5. Database Dump");
+    Serial.println("6. Force Flash Save");
+    Serial.println("7. Clear Database (Wipe All)");
+    Serial.println("M. Show Menu");
+    Serial.print("Choice: ");
 }
 
 void handleIngang(MCP2515 &mcp) {
@@ -29,14 +29,14 @@ void handleIngang(MCP2515 &mcp) {
     memcpy(frame.data + Data::ID_SIZE, "TEST", 4);
     
     if (mcp.sendMessage(&frame) == MCP2515::ERROR_OK) {
-        Serial.printf("\n[TEST] Auto aangemeld met ID: %u\n", lastUsedId);
+        Serial.printf("\n[TEST] Car registered with ID: %u\n", lastUsedId);
     } else {
-        Serial.println("\n[TEST] Fout bij versturen ingang bericht");
+        Serial.println("\n[TEST] Error sending entry message");
     }
 }
 
 void handlePayment(MCP2515 &mcp) {
-    Serial.printf("\nVoer ID in om te betalen (leeg voor %u): ", lastUsedId);
+    Serial.printf("\nEnter ID to pay (empty for %u): ", lastUsedId);
     while(!Serial.available()) { delay(10); }
     
     String input = Serial.readStringUntil('\n');
@@ -48,12 +48,12 @@ void handlePayment(MCP2515 &mcp) {
     memcpy(frame.data, &id, Data::ID_SIZE);
 
     if (mcp.sendMessage(&frame) == MCP2515::ERROR_OK) {
-        Serial.printf("[TEST] Betaling verzonden voor ID: %u\n", id);
+        Serial.printf("[TEST] Payment sent for ID: %u\n", id);
     }
 }
 
 void handleRequest(MCP2515 &mcp) {
-    Serial.printf("\nVoer ID in om op te vragen (leeg for %u): ", lastUsedId);
+    Serial.printf("\nEnter ID to request (empty for %u): ", lastUsedId);
     while(!Serial.available()) { delay(10); }
     
     String input = Serial.readStringUntil('\n');
@@ -65,7 +65,7 @@ void handleRequest(MCP2515 &mcp) {
     memcpy(frame.data, &id, Data::ID_SIZE);
 
     if (mcp.sendMessage(&frame) == MCP2515::ERROR_OK) {
-        Serial.printf("[TEST] Sessie opvraag verzonden voor ID: %u\n", id);
+        Serial.printf("[TEST] Request sent for ID: %u\n", id);
     }
 }
 
@@ -77,7 +77,7 @@ void handleLowestId(MCP2515 &mcp) {
     memcpy(frame.data, &special, Data::ID_SIZE);
 
     if (mcp.sendMessage(&frame) == MCP2515::ERROR_OK) {
-        Serial.println("\n[TEST] Verzoek voor laagste ID verzonden");
+        Serial.println("\n[TEST] Lowest ID request sent");
     }
 }
 
@@ -102,11 +102,11 @@ void runTestMenu(MCP2515 &mcp) {
             case '6': db.saveToFlash(); break;
             case '7': db.clear(); break;
             case 'M': displayMenu(); break;
-            default: if (choice != '\n' && choice != '\r') Serial.println("\nOngeldige keuze"); break;
+            default: if (choice != '\n' && choice != '\r') Serial.println("\nInvalid choice"); break;
         }
         
         if (choice != 'M') {
-            delay(500); // Wacht even op CAN afhandeling
+            delay(500); // Wait for CAN processing
             displayMenu();
         }
     }
