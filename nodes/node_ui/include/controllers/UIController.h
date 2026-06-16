@@ -17,6 +17,9 @@ private:
     ISpotManager& _spotManager;
     IGateController& _gateController;
 
+    GateMode _gate1Mode = GateMode::ENTRY;
+    GateMode _gate2Mode = GateMode::EXIT;
+
     void handleInput(String input);
     void onSpotUpdate(int spotID, bool occupied);
     void onStateChange(int state);

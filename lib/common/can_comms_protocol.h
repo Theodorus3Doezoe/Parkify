@@ -17,7 +17,10 @@ enum CAN_MessageID {
   TX_SESSION_DATA = 11,
   CMD_GATE_CONTROL = 12,
   REQ_ID_BY_PLATE = 13,
+  BR_GATE_MODE = 14,
 
   // Node id's 20 - 29
   NODE_BASE_ID = 20,
 };
+
+enum GateMode : uint8_t { ENTRY = 0, EXIT = 1 };

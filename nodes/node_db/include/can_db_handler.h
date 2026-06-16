@@ -1,14 +1,14 @@
 #pragma once
 
 #include "can_comms_protocol.h"
-#include "db_memory.h"
 #include "database/database_models.h"
+#include "db_memory.h"
 #include <mcp2515.h>
 
 class CANDatabaseHandler {
 public:
 private:
-    MCP2515& _mcp;
+  MCP2515 &_mcp;
   Database &_db;
   uint16_t _lastNoticedId = 0;
 
@@ -17,6 +17,7 @@ private:
   void handleValidation(const struct can_frame &frame);
   void handleSessionRequest(const struct can_frame &frame);
   void handleIdByPlateRequest(const struct can_frame &frame);
+  void handleExit(const struct can_frame &frame);
 
   void sendSessionData(uint16_t id);
 

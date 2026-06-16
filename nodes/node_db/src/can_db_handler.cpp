@@ -1,5 +1,8 @@
 #include "can_db_handler.h"
+#include "can_comms_protocol.h"
+#include "node_db/include/can_db_handler.h"
 #include <Arduino.h>
+#include <cstdint>
 
 CANDatabaseHandler::CANDatabaseHandler(MCP2515 &mcp, Database &db)
     : _mcp(mcp), _db(db) {}
@@ -20,6 +23,10 @@ void CANDatabaseHandler::checkMessages() {
     case REQ_SESSION_DATA:
       handleSessionRequest(frame);
       break;
+    case BR_EXIT:
+      handleExit(frame);
+      break;
+
     case TX_SESSION_DATA:
       // For loopback testing/diagnostics
       {
@@ -170,4 +177,17 @@ void CANDatabaseHandler::sendSessionData(uint16_t id) {
 
   _mcp.sendMessage(&response);
   Serial.printf("[CAN DB] Sent Data: ID %u\n", id);
+}
+
+void CANDatabaseHandler::handleExit(const struct can_frame &frame) {
+  if (frame.can_dlc < Data::ID_SIZE)
+    return;
+  uint16_t id = 0;
+  memcpy(&id, frame.data, Data::ID_SIZE);
+
+  if (_db.remove(id)) {
+    Serial.printf("[CAN DB] Removed: ID %u\n", id);
+  } else {
+    Serial.printf("[CAN DB] Exit error: ID %u not found\n", id);
+  }
 }

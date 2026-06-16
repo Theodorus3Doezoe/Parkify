@@ -2,6 +2,7 @@
 
 #include "interfaces/IFireSensor.h"
 #include "interfaces/IEmergencyBroadcaster.h"
+#include "can_config.h"
 
 class FireDetectionSystem {
 private:
@@ -12,5 +13,7 @@ private:
 public:
     FireDetectionSystem(IFireSensor& s, IEmergencyBroadcaster& b);
     void checkSensors();
+    void reset();
+    void handleStateChange(SystemState newState);
     bool isFireDetected();
 };

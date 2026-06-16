@@ -22,3 +22,12 @@ void CANGateController::closeGate(int gateID) {
     _mcp.sendMessage(&frame);
 }
 
+void CANGateController::setGateMode(int gateID, GateMode mode) {
+    struct can_frame frame;
+    frame.can_id = BR_GATE_MODE;
+    frame.can_dlc = 2;
+    frame.data[0] = (uint8_t)gateID;
+    frame.data[1] = (uint8_t)mode;
+    _mcp.sendMessage(&frame);
+}
+

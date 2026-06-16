@@ -1,5 +1,11 @@
 #include "sensors/FireSensor.h"
+#include <Arduino.h>
 
-FireSensor::FireSensor(int id) : _sensorID(id) {}
+FireSensor::FireSensor(int pin) : _pin(pin) {
+    pinMode(_pin, INPUT_PULLUP);
+}
 
-bool FireSensor::readSignal() { return false; }
+bool FireSensor::readSignal() { 
+    // Assuming active low button (pressed = LOW)
+    return digitalRead(_pin) == LOW; 
+}

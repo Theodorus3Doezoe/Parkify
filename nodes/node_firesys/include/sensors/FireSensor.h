@@ -4,8 +4,8 @@
 
 class FireSensor : public IFireSensor {
 private:
-    int _sensorID;
+    int _pin;
 public:
-    FireSensor(int id);
+    FireSensor(int pin);
     bool readSignal() override;
 };

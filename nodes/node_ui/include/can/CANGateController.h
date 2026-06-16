@@ -10,4 +10,5 @@ public:
     CANGateController(MCP2515& mcp);
     void openGate(int gateID) override;
     void closeGate(int gateID) override;
+    void setGateMode(int gateID, GateMode mode) override;
 };

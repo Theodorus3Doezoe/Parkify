@@ -41,6 +41,14 @@ void UIController::handleInput(String input) {
   } else if (input.equalsIgnoreCase("K")) {
     _gateController.closeGate(2);
     _display.logMessage("Command: Close Exit Gate");
+  } else if (input.equalsIgnoreCase("1")) {
+    _gate1Mode = (_gate1Mode == GateMode::ENTRY) ? GateMode::EXIT : GateMode::ENTRY;
+    _gateController.setGateMode(1, _gate1Mode);
+    _display.logMessage("Gate 1: " + String(_gate1Mode == GateMode::ENTRY ? "ENTRY" : "EXIT"));
+  } else if (input.equalsIgnoreCase("2")) {
+    _gate2Mode = (_gate2Mode == GateMode::ENTRY) ? GateMode::EXIT : GateMode::ENTRY;
+    _gateController.setGateMode(2, _gate2Mode);
+    _display.logMessage("Gate 2: " + String(_gate2Mode == GateMode::ENTRY ? "ENTRY" : "EXIT"));
   }
 }
 
