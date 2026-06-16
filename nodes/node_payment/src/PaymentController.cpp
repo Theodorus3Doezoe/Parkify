@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 
+
 PaymentController::PaymentController(ILicensePlateScanner* scanner, MCP2515* canBus) 
 : scanner(scanner)
 , canBus(canBus)
@@ -12,6 +13,7 @@ PaymentController::PaymentController(ILicensePlateScanner* scanner, MCP2515* can
 void PaymentController::Run()
 {
     String license = scanner->Scan();
+    int length;
     if (license == "")
     {
         return;
@@ -19,12 +21,25 @@ void PaymentController::Run()
 
     struct can_frame txMsg;
 
-    int length = license.length();
-    char arr[length + 1];
-    strcpy(arr, license.c_str());
 
+    // Sending parking ID over CAN
+    u_int16_t parkingID = dbClient.requestIdByPlate(license.c_str());
+    length = sizeof(parkingID);
+    // copy raw bytes of parkingID into the CAN frame data
+    txMsg.can_id = TX_VALIDATION;
+    txMsg.can_dlc = length;
+    // can_frame.data is an array, copy bytes into it
+    memcpy(txMsg.data, &parkingID, length);
+    canBus->sendMessage(&txMsg);
+
+
+
+    
+    // Sending licence plate over CAN
+    length = license.length();
+    if (length > 8) length = 8; // ensure fits in CAN data field
     txMsg.can_id = TX_VALIDATED_REG;
-    txMsg.can_dlc = strlen(arr);
-
+    txMsg.can_dlc = length;
+    memcpy(txMsg.data, license.c_str(), length);
     canBus->sendMessage(&txMsg);
 }
