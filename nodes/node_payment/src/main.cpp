@@ -6,6 +6,7 @@
 #include "../lib/common/ILicensePlateScanner.h"
 #include "node_payment/include/Headers/PaymentController.h"
 
+
 #define SCK 18
 #define SIMO 19
 #define MOSI 23
