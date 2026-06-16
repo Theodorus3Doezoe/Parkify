@@ -17,18 +17,14 @@ void UIController::run() {
   _display.render();
   delay(50);
 }
-
 void UIController::handleInput(String input) {
   input.trim();
   if (input.equalsIgnoreCase("O")) {
     onStateChange(SystemState::OPEN);
-    _display.logMessage("Set State: OPEN");
   } else if (input.equalsIgnoreCase("C")) {
     onStateChange(SystemState::CLOSED);
-    _display.logMessage("Set State: CLOSED");
   } else if (input.equalsIgnoreCase("E")) {
     onStateChange(SystemState::EMERGENCY);
-    _display.logMessage("Set State: EMERGENCY");
   } else if (input.equalsIgnoreCase("G")) {
     _gateController.openGate(1);
     _display.logMessage("Command: Open Entry Gate");
@@ -44,10 +40,12 @@ void UIController::handleInput(String input) {
   } else if (input.equalsIgnoreCase("1")) {
     _gate1Mode = (_gate1Mode == GateMode::ENTRY) ? GateMode::EXIT : GateMode::ENTRY;
     _gateController.setGateMode(1, _gate1Mode);
+    _display.showGateMode(1, (int)_gate1Mode);
     _display.logMessage("Gate 1: " + String(_gate1Mode == GateMode::ENTRY ? "ENTRY" : "EXIT"));
   } else if (input.equalsIgnoreCase("2")) {
     _gate2Mode = (_gate2Mode == GateMode::ENTRY) ? GateMode::EXIT : GateMode::ENTRY;
     _gateController.setGateMode(2, _gate2Mode);
+    _display.showGateMode(2, (int)_gate2Mode);
     _display.logMessage("Gate 2: " + String(_gate2Mode == GateMode::ENTRY ? "ENTRY" : "EXIT"));
   }
 }
@@ -66,7 +64,7 @@ void UIController::updateFromCAN() {
   struct can_frame frame;
   static int vehicleCount = 0;
 
-  if (_mcp.readMessage(&frame) == MCP2515::ERROR_OK) {
+  while (_mcp.readMessage(&frame) == MCP2515::ERROR_OK) {
     switch (frame.can_id) {
     case TX_SPOT_INFO:
       onSpotUpdate((int)frame.data[1], (bool)frame.data[0]);

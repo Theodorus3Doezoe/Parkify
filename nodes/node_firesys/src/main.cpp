@@ -1,4 +1,5 @@
 #include "can/CANEmergencyBroadcaster.h"
+#include "can_comms_protocol.h"
 #include "can_config.h"
 #include "sensors/FireSensor.h"
 #include "systems/FireDetectionSystem.h"
@@ -8,7 +9,7 @@
 
 MCP2515 mcp2515(CAN_SPI_CS_PIN);
 
-FireSensor sensor(1);
+FireSensor sensor(15);
 CANEmergencyBroadcaster broadcaster(mcp2515);
 FireDetectionSystem fireSystem(sensor, broadcaster);
 
@@ -27,7 +28,18 @@ void setup() {
   setupCanBus();
 }
 
+void checkCanMessages() {
+  struct can_frame frame;
+  while (mcp2515.readMessage(&frame) == MCP2515::ERROR_OK) {
+    if (frame.can_id == BR_STATE && frame.can_dlc >= 1) {
+      SystemState newState = static_cast<SystemState>(frame.data[0]);
+      fireSystem.handleStateChange(newState);
+    }
+  }
+}
+
 void loop() {
   fireSystem.checkSensors();
+  checkCanMessages();
   delay(100);
 }

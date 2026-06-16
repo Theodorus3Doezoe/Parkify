@@ -12,6 +12,8 @@ private:
     
     String _logs[5];
     int _logIndex = 0;
+    int _gate1Mode = 0; // 0=Entry, 1=Exit
+    int _gate2Mode = 1;
     bool _isDirty = true;
 
 public:
@@ -20,6 +22,7 @@ public:
     void showVehicleCount(int count) override;
     void showSpotOverview(const SpotStatus* spots, int count) override;
     void showGateStatus(int gateID, bool open) override;
+    void showGateMode(int gateID, int mode);
     void showError(String message) override;
     void logMessage(String message) override;
     void render() override;

@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 enum CAN_MessageID {
   // base system 1 - 9
@@ -18,6 +19,7 @@ enum CAN_MessageID {
   CMD_GATE_CONTROL = 12,
   REQ_ID_BY_PLATE = 13,
   BR_GATE_MODE = 14,
+  BR_GATE_CONTROL = 15,
 
   // Node id's 20 - 29
   NODE_BASE_ID = 20,

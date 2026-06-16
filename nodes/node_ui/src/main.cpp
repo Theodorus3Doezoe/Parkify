@@ -13,7 +13,7 @@ MCP2515 mcp2515(CAN_SPI_CS_PIN);
 
 ConsoleInputReader inputReader;
 ConsoleDisplay display;
-CANStateController stateController(mcp2515);
+CANStateController stateController(mcp2515, display);
 CANSpotManager spotManager(mcp2515);
 CANGateController gateController(mcp2515);
 

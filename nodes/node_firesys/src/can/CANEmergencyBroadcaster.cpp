@@ -9,5 +9,12 @@ void CANEmergencyBroadcaster::broadcastEmergency() {
   frame.can_id = BR_STATE;
   frame.can_dlc = 1;
   frame.data[0] = SystemState::EMERGENCY;
-  _mcp.sendMessage(&frame);
+  
+  MCP2515::ERROR err = _mcp.sendMessage(&frame);
+  if (err == MCP2515::ERROR_OK) {
+    Serial.println("CAN: Emergency broadcast sent successfully.");
+  } else {
+    Serial.print("CAN: Error sending emergency broadcast: ");
+    Serial.println((int)err);
+  }
 }

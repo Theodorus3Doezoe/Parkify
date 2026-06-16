@@ -10,6 +10,7 @@ public:
     virtual void showVehicleCount(int count) = 0;
     virtual void showSpotOverview(const SpotStatus* spots, int count) = 0;
     virtual void showGateStatus(int gateID, bool open) = 0;
+    virtual void showGateMode(int gateID, int mode) = 0;
     virtual void showError(String message) = 0;
     virtual void logMessage(String message) = 0;
     virtual void render() = 0;

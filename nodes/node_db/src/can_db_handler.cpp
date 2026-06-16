@@ -92,7 +92,6 @@ void CANDatabaseHandler::handleValidation(const struct can_frame &frame) {
     _db.add(id, *session);
     Serial.printf("[CAN DB] Paid: ID %u\n", id);
 
-    // Send confirmation broadcast (ID 8)
     struct can_frame response{};
     response.can_id = TX_VALIDATED_REG;
     response.can_dlc = 2 + 3; // ID (2) + Plate (3)

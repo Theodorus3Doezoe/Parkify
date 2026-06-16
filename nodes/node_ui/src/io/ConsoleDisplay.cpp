@@ -45,6 +45,12 @@ void ConsoleDisplay::showGateStatus(int gateID, bool open) {
     logMessage("Gate " + String(gateID) + ": " + (open ? "OPEN" : "CLOSED"));
 }
 
+void ConsoleDisplay::showGateMode(int gateID, int mode) {
+    if (gateID == 1) _gate1Mode = mode;
+    else if (gateID == 2) _gate2Mode = mode;
+    _isDirty = true;
+}
+
 void ConsoleDisplay::showError(String message) {
     logMessage("ERR: " + message);
 }
@@ -58,8 +64,9 @@ void ConsoleDisplay::logMessage(String message) {
 void ConsoleDisplay::render() {
     if (!_isDirty) return;
 
+    // \033[?25l = Hide cursor
     // \033[H = Cursor to top-left
-    Serial.print("\033[H");
+    Serial.print("\033[?25l\033[H");
 
     Serial.println("\033[33m╔════════════════ PARKING GARAGE DASHBOARD ════════════════╗\033[0m");
     
@@ -73,6 +80,13 @@ void ConsoleDisplay::render() {
     }
     Serial.print(" | Vehicles: ");
     Serial.print(_vehicleCount);
+    Serial.println("                     ");
+
+    // Gate Mode Row
+    Serial.print("  Gate 1: ");
+    Serial.print(_gate1Mode == 0 ? "ENTRY" : "EXIT ");
+    Serial.print(" | Gate 2: ");
+    Serial.print(_gate2Mode == 0 ? "ENTRY" : "EXIT ");
     Serial.println("                     ");
 
     Serial.println("╟──────────────────────────────────────────────────────────╢");
@@ -97,7 +111,7 @@ void ConsoleDisplay::render() {
     }
 
     Serial.println("\033[33m╚══════════════════════════════════════════════════════════╝\033[0m");
-    Serial.print("  [O]pen [C]lose [E]mergency | [G/H] Entry G/S | [J/K] Exit G/S | In: ");
+    Serial.print("  [O/C/E] State | [G/H] G1 O/C | [J/K] G2 O/C | [1/2] G1/2 Toggle");
     
     _isDirty = false;
 }
