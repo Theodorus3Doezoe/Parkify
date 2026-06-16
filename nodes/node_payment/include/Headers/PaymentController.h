@@ -4,6 +4,7 @@
 #include "../lib/common/can_config.h"
 #include "../lib/common/can_comms_protocol.h"
 #include "../lib/common/database/database_client.h"
+#include <cstring>
 
 class PaymentController{
 
