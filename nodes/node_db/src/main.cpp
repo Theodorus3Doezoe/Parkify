@@ -8,14 +8,13 @@
 MCP2515 mcp2515(CAN_SPI_CS_PIN);
 CANDatabaseHandler dbHandler(mcp2515, db);
 
-// Externe functie uit test_db.cpp
 extern void runTestMenu(MCP2515 &mcp);
 
 void setupCanBus() {
-  SPI.begin(); // Ensure SPI is initialized
+  SPI.begin();
   mcp2515.reset();
   if (mcp2515.setBitrate(CAN_BITRATE, CAN_CLOCK_SPEED) == MCP2515::ERROR_OK) {
-    if (mcp2515.setLoopbackMode() != MCP2515::ERROR_OK) {
+    if (mcp2515.setNormalMode() != MCP2515::ERROR_OK) {
       Serial.println("ERR: CAN Loopback Mode");
     } else {
       Serial.println("CAN Loopback Mode Active");
@@ -32,7 +31,7 @@ void setup() {
 
   Serial.println("\n--- DB Node Ready ---");
   setupCanBus();
-  
+
   if (!db.begin()) {
     Serial.println("DB Init Failed!");
   }

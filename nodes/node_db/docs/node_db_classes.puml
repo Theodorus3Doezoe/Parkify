@@ -1,0 +1,76 @@
+@startuml node_db_classes
+
+package "node_db" {
+    class CANDatabaseHandler {
+        - _mcp : MCP2515&
+        - _db : Database&
+        - _lastNoticedId : uint16_t
+        --
+        + CANDatabaseHandler(mcp : MCP2515&, db : Database&)
+        + checkMessages() : void
+        --
+        - handleEntryNotice(frame : const can_frame&) : void
+        - handleEntryRegistration(frame : const can_frame&) : void
+        - handleValidation(frame : const can_frame&) : void
+        - handleSessionRequest(frame : const can_frame&) : void
+        - handleIdByPlateRequest(frame : const can_frame&) : void
+        - sendSessionData(id : uint16_t) : void
+    }
+
+    class Database {
+        - {static} DEFAULT_SAVE_INTERVAL : unsigned long
+        - {static} DEFAULT_FILEPATH : const char*
+        - {static} BASE_PATH : const char*
+        - {static} PARTITION_LABEL : const char*
+        - _db : std::map<uint16_t, Data>
+        - nextId : uint16_t
+        - freeIds : std::priority_queue<uint16_t>
+        - filepath : const char*
+        - isChanged : bool
+        - lastSaveTime : unsigned long
+        - saveInterval : unsigned long
+        --
+        + Database()
+        + begin() : bool
+        + add(id : uint16_t, data : const Data&) : void
+        + get(id : uint16_t) : std::optional<Data>
+        + findIdByPlate(plate : const char*) : std::optional<uint16_t>
+        + exists(id : uint16_t) : bool
+        + remove(id : uint16_t) : bool
+        + getLowestId() : uint16_t
+        + printDatabase() : void
+        + saveToFlash() : bool
+        + autoSave() : void
+        + clear() : void
+        - loadFromFlash() : bool
+    }
+}
+
+package "common" {
+    struct Data {
+        + {static} ID_SIZE : size_t
+        + {static} LICENCE_PLATE_SIZE : size_t
+        + licenceplate : std::array<char, 4>
+        + created_at : uint32_t
+        + payed : bool
+    }
+
+    enum SessionStatus {
+        NOT_PAID
+        PAID
+        NOT_FOUND
+    }
+
+    enum SpecialID {
+        LOWEST_ID
+        NOT_FOUND
+    }
+}
+
+CANDatabaseHandler "1" o-- "1" Database : manages
+Database "1" *-- "many" Data : stores
+CANDatabaseHandler ..> Data : processes
+CANDatabaseHandler ..> SessionStatus : uses
+CANDatabaseHandler ..> SpecialID : uses
+
+@enduml

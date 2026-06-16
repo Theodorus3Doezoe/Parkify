@@ -2,7 +2,6 @@
 #include "HardwareSerial.h"
 #include "esp_err.h"
 #include <cstdint>
-#include <cstdio>
 #include <esp_littlefs.h>
 #include <string_view>
 #include <sys/types.h>
@@ -43,10 +42,12 @@ bool Database::begin() {
 
 void Database::add(uint16_t id, const Data &data) {
   bool needsUpdate = false;
+  bool isNewSession = false;
 
   auto it = _db.find(id);
   if (it == _db.end()) {
     needsUpdate = true;
+    isNewSession = true;
   } else {
     std::string_view currentPlate(it->second.licenceplate.data());
     std::string_view newPlate(data.licenceplate.data());
@@ -58,6 +59,11 @@ void Database::add(uint16_t id, const Data &data) {
   }
 
   if (needsUpdate) {
+    if (!freeIds.empty() && freeIds.top() == id) {
+      freeIds.pop();
+    } else if (id == nextId + 1) {
+      nextId++;
+    }
     _db[id] = data;
     isChanged = true;
     Serial.printf("In-memory DB updated: ID %u\n", id);
@@ -68,6 +74,15 @@ std::optional<Data> Database::get(uint16_t id) {
   auto it = _db.find(id);
   if (it != _db.end()) {
     return it->second;
+  }
+  return std::nullopt;
+}
+
+std::optional<uint16_t> Database::findIdByPlate(const char *plate) {
+  for (const auto &[id, data] : _db) {
+    if (memcmp(data.licenceplate.data(), plate, 3) == 0) {
+      return id;
+    }
   }
   return std::nullopt;
 }
@@ -161,10 +176,9 @@ bool Database::loadFromFlash() {
         freeIds.push(i);
       }
     }
-    Serial.printf("Loaded highest id in map = %d\n", highestId);
+
   } else {
     nextId = 0;
-    Serial.printf("Loaded id = %d\n", nextId);
   }
   Serial.printf("%d records loaded from flash\n", _db.size());
   return true;
@@ -179,13 +193,10 @@ void Database::autoSave() {
 }
 
 uint16_t Database::getLowestId() {
-
   if (!freeIds.empty()) {
-    uint16_t lowestId = freeIds.top();
-    freeIds.pop();
-    return lowestId;
+    return freeIds.top();
   } else {
-    return nextId++;
+    return nextId + 1;
   }
 }
 
@@ -219,11 +230,11 @@ void Database::printDatabase() {
 
 void Database::clear() {
   _db.clear();
-  while (!freeIds.empty()) freeIds.pop();
+  while (!freeIds.empty())
+    freeIds.pop();
   nextId = 0;
   isChanged = true;
-  
-  unlink(filepath); 
+  unlink(filepath);
   Serial.println("Database cleared in memory and on flash.");
 }
 
