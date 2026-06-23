@@ -16,10 +16,9 @@ enum CAN_MessageID {
   // DB id's 10 - 19
   REQ_SESSION_DATA = 10,
   TX_SESSION_DATA = 11,
-  CMD_GATE_CONTROL = 12,
-  REQ_ID_BY_PLATE = 13,
-  BR_GATE_MODE = 14,
-  BR_GATE_CONTROL = 15,
+  REQ_ID_BY_PLATE = 12,
+  BR_GATE_MODE = 13,
+  BR_GATE_CONTROL = 14,
 
   // Node id's 20 - 29
   NODE_BASE_ID = 20,
