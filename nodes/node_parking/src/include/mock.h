@@ -14,11 +14,11 @@ public:
 
 class mockSensor : public IOccupancySensor {
 private:
-    bool mockState;
+    sensorState mockState;
 
 public:
-    mockSensor(bool state);
-    bool sensorTriggered() override;
+    mockSensor(bool occupied);
+    sensorState sensorTriggered() override;
     void setOccupancy(bool occupied);
 };
 

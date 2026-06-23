@@ -28,5 +28,6 @@ bool canbus::tx_message(message_frame msg)
         Tx.data[i] = msg.data[i];
     }
     mcp2515.sendMessage(&Tx);
+    mcp2515.sendMessage(&Tx);
     return true;
 }

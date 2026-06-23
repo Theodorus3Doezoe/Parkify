@@ -9,9 +9,12 @@ bool spot::update()
     if (millis() > nextUpdate) {
         nextUpdate = millis() + SENSOR_UPDATE_INTERVAL;
         bool occupancyStart = getOccupancy();
+        sensorState trigger = sensor->sensorTriggered();
         
-        if (sensor->sensorTriggered()) {
+        if (trigger == sensorState::Occupied) {
             state = spotState::Occupied;
+        } else if (trigger == sensorState::Sensor_Error) {
+            state = spotState::Error;
         } else if (state != spotState::Reserved) {
             state = spotState::Free;
         }
@@ -21,40 +24,61 @@ bool spot::update()
         }
     }
     
-    
     if ((millis() > reservationExpiration)  & (state == spotState::Reserved)) {
         Serial.printf("SPOT %d: Reservation expired on %d", getId(), millis());
         state = spotState::Free;
     }
 
-    if (state == spotState::Occupied) {
+    switch (state)
+    {
+    case spotState::Occupied:
         indicator->setLightState(indicatorState::Occupied);
-    } else if (state == spotState::Reserved) {
+        break;
+        
+    case spotState::Reserved:
         indicator->setLightState(indicatorState::Reserved);
-    } else {
+        break;
+    
+    case spotState::Free:
         indicator->setLightState(indicatorState::Free);
+        break;
+    
+    case spotState::Error:
+        indicator->setLightState(indicatorState::ErrorIndicator);
+        break;
     }
 
     indicator->update();
-
     return update;
 }
 
-bool spot::getOccupancy() { return (state == spotState::Occupied); }
+bool spot::getOccupancy()
+{
+    if (state == spotState::Free) {
+        return false;
+    }
+
+    return true;
+}
 
 uint16_t spot::getId() { return id; }
 
 uint16_t spot::getPriority() { return priority; }
 
+spotState spot::getState() { return state; }
+
 void spot::setIndicator(indicatorState state) { indicator->setLightState(state); }
 
-void spot::setReservation(bool set)
+void spot::setReservation(bool set, uint8_t level)
 {
     if (set) {
         state = spotState::Reserved;
+        reservationLevel = level;
         reservationExpiration = millis() + 10000;
         Serial.printf("SPOT %d: Reserved until %d\n", getId(), reservationExpiration);
     } else {
         state = spotState::Free;
     }
 }
+
+uint8_t spot::getReservationLevel() { return reservationLevel; }

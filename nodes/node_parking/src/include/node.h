@@ -26,6 +26,7 @@ private:
     void Tx_SpotInfo(uint16_t SpotId, bool occupancy);
     void Rx_Entry();
     void Rx_Prio(message_frame* msg);
+    void Rx_SpotInfo(message_frame* msg);
     spotInfo getBestSpot();
 
 public:

@@ -43,7 +43,7 @@ void userInput()
   if (Serial.available() > 0) {
     uint8_t input = Serial.read() - 47;
     if (input <= SPOTS) {
-      sensors[input].setOccupancy(!sensors[input].sensorTriggered());
+      sensors[input].setOccupancy(!(sensors[input].sensorTriggered() == sensorState::Occupied));
     }
   }
 }
@@ -51,7 +51,7 @@ void userInput()
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 

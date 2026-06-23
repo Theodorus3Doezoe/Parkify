@@ -7,11 +7,25 @@ void mockIndicator::setLightState(indicatorState state) { mockState = state; }
 void mockIndicator::update() {}
 
 
-mockSensor::mockSensor(bool state) : mockState(state) {}
+mockSensor::mockSensor(bool occupied)
+{
+    if (occupied) {
+        mockState = sensorState::Occupied;
+    } else {
+        mockState = sensorState::Free;
+    }
+}
 
-bool mockSensor::sensorTriggered() { return mockState; }
+sensorState mockSensor::sensorTriggered() { return mockState; }
 
-void mockSensor::setOccupancy(bool occupied) { mockState = occupied; }
+void mockSensor::setOccupancy(bool occupied)
+{
+    if (occupied) {
+        mockState = sensorState::Occupied;
+    } else {
+        mockState = sensorState::Free;
+    }
+}
 
 
 mockCommunication::mockCommunication() {}
