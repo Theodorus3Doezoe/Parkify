@@ -1,0 +1,59 @@
+@startuml state_diagram
+
+state "Node state" as NodeBox {
+    [*] --> NodeIdle : Init
+    NodeIdle --> NodeNegotiating : Entry detected
+    NodeNegotiating --> NodeDone : Nogotiation timeout reached
+    NodeDone --> NodeIdle : Best spot calculated and reserved
+
+    state "Idle" as NodeIdle
+    NodeIdle : do/ Update notes
+
+    state "Negotiating" as NodeNegotiating
+    NodeNegotiating : entry/ Calculate and transmit best parking spot priority
+    NodeNegotiating : do/ Listen for other spot prioritys
+
+    state "Done" as NodeDone
+    NodeDone : entry/ Check if best spot is own spot, if so reserve it
+    NodeDone : exit/ Clear used variables
+}
+
+state "Spot state" as SpotBox {
+    [*] --> FreeSpot : [Sensor clear]
+    [*] --> OccupiedSpot : [Sensor triggered]
+
+    FreeSpot --> OccupiedSpot : Sensor triggered
+    OccupiedSpot --> FreeSpot : Sensor is cleared
+    FreeSpot --> ReservedSpot : Spot gets reserved
+    ReservedSpot --> OccupiedSpot : Sensor triggered
+    ReservedSpot --> FreeSpot : Reservation expires
+    FreeSpot --> ErrorSpot : Hardware error detected
+    OccupiedSpot --> ErrorSpot
+    ReservedSpot --> ErrorSpot
+
+    state "Free" as FreeSpot
+    FreeSpot : Entry/ Update indicator, send spot info to the network
+
+    state "Occupied" as OccupiedSpot
+    OccupiedSpot : Entry/ Update indicator, send spot info to the network
+
+    state "Reserved" as ReservedSpot
+    ReservedSpot : Entry/ Update indicator
+
+    state "Error" as ErrorSpot
+    ErrorSpot : Entry/ Update indicator, send DTC to the UI
+}
+
+state "Sensor state" as SensorBox {
+    [*] -d-> SensorClear : Init
+    SensorClear --> SensorTriggered : Vehicle detected
+    SensorTriggered --> SensorClear : Vehicle not detected
+
+    state "Clear" as SensorClear
+    SensorClear : Entry/ Set spot to Free
+
+    state "Triggered" as SensorTriggered
+    SensorTriggered : Entry/ Set spot to occupied
+}
+
+@enduml
