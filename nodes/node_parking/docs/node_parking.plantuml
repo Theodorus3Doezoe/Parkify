@@ -1,5 +1,16 @@
 @startuml node_parking
 package "Parking node" {
+
+interface Ispot
+{
+    +~spot();
+    +update() : void
+    +getOccupancy() : bool
+    +getId() : uint16_t
+    +getPriority() : uint16_t
+    +setReservation(set : bool) : void
+}
+
 interface iCommunication
 {
     +~ICommunication()
@@ -40,13 +51,13 @@ class spot
     -occupied : bool
     -reserved : bool
     -reservationExpiration : uint16_t
+    -setIndicator(state : indicatorState) : void
     +spot(initId : uint16_t, initPrio : uint16_t,
         initSensor : IOccupancySensor*, initIndicator : IStatusIndicator*);
     +update() : void
     +getOccupancy() : bool
     +getId() : uint16_t
     +getPriority() : uint16_t
-    +setIndicator(state : indicatorState) : void
     +setReservation(set : bool) : void
 }
 
@@ -82,12 +93,13 @@ class sonarsensor
     +sensorTriggered() : bool
 }
 
-node --> spot
+node --> Ispot
 
-spot --> iCommunication
+node --> iCommunication
 spot --> IOccupancySensor
 spot --> IStatusIndicator
 
+Ispot <|-- spot
 iCommunication <|-- canbus
 IOccupancySensor <|-- sonarsensor
 IStatusIndicator <|-- ledIndicator

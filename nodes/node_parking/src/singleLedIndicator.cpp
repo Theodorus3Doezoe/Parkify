@@ -29,6 +29,10 @@ void singleLedIndicator::update()
         case indicatorState::Occupied:
             digitalWrite(led, LOW);
             break;
+
+        case indicatorState::ErrorIndicator:
+            update();
+            break;
         
         default:
             break;
@@ -39,6 +43,13 @@ void singleLedIndicator::update()
         if (millis() > timeToChange) {
             digitalWrite(led, (!digitalRead(led)));
             timeToChange = millis() + BLINK_INTERVAL;
+        }
+    }
+
+    if (state == indicatorState::ErrorIndicator) {
+        if (millis() > timeToChange) {
+            digitalWrite(led, (!digitalRead(led)));
+            timeToChange = millis() + ERROR_BLINK_INTERVAL;
         }
     }
 }

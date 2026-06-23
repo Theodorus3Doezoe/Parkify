@@ -9,5 +9,5 @@ private:
     uint16_t trigger_distance;
 public:
     sonarsensor(uint8_t trig_pin, uint8_t ech_pin, uint16_t trig_distance);
-    bool sensorTriggered() override;
+    sensorState sensorTriggered() override;
 };

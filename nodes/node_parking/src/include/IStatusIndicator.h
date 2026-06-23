@@ -1,6 +1,6 @@
 #pragma once
 
-enum class indicatorState { Free, Reserved, Occupied };
+enum class indicatorState { Free, Reserved, Occupied, ErrorIndicator };
 
 class IStatusIndicator
 {

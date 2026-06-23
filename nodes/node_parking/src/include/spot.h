@@ -1,13 +1,10 @@
 #pragma once
-#include <stdint.h>
+#include "Ispot.h"
 #include <Arduino.h>
 #include "IOccupancySensor.h"
 #include "IStatusIndicator.h"
-#include "definitions.h"
 
-enum spotState { Free, Reserved, Occupied };
-
-class spot
+class spot : public Ispot
 {
 private:
     IOccupancySensor* sensor;
@@ -17,7 +14,10 @@ private:
     uint16_t priority;
     uint32_t nextUpdate;
     spotState state = spotState::Free;
+    uint8_t reservationLevel;
     uint32_t reservationExpiration;
+
+    void setIndicator(indicatorState state);
 
 public:
     spot(uint16_t initId, uint16_t initPrio, IOccupancySensor* initSensor, IStatusIndicator* initIndicator);
@@ -25,6 +25,7 @@ public:
     bool getOccupancy();
     uint16_t getId();
     uint16_t getPriority();
-    void setIndicator(indicatorState state);
-    void setReservation(bool set);
+    spotState getState();
+    void setReservation(bool set, uint8_t level);
+    uint8_t getReservationLevel();
 };

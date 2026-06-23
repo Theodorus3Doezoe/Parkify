@@ -6,7 +6,7 @@ sonarsensor::sonarsensor(uint8_t trig_pin, uint8_t ech_pin, uint16_t trig_distan
     pinMode(echo_pin, INPUT);
 }
 
-bool sonarsensor::sensorTriggered()
+sensorState sonarsensor::sensorTriggered()
 {
   digitalWrite(trigger_pin, LOW);
   delay(2);
@@ -15,12 +15,14 @@ bool sonarsensor::sensorTriggered()
   delay(10);
   digitalWrite(trigger_pin, LOW);
   
-  uint16_t duration = pulseIn(echo_pin, HIGH);
+  uint16_t duration = pulseIn(echo_pin, HIGH, 1000000);
   uint16_t distance = (duration * 0.034) / 2;
 
-  if (distance < trigger_distance) {
-    return true;
+  if (distance < 2) {
+    return sensorState::Sensor_Error;
+  } else if (distance < trigger_distance) {
+    return sensorState::Occupied;
   }
 
-  return false;
+  return sensorState::Free;
 }

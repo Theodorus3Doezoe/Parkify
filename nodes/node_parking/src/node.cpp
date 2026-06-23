@@ -1,11 +1,15 @@
 #include "include/node.h"
 
-node::node(const std::array<spot, SPOTS>& inSpots, ICommunication* inCom) : spots(inSpots), com(inCom){}
+node::node(const std::array<spot, SPOTS>& inSpots, ICommunication* inCom) 
+: spots(inSpots)
+, com(inCom){}
 
 void node::run()
 {
     message_frame msg;
     msg.id = 0;
+    msg.data[0] = 0;
+    msg.data[1] = 0;
     bool received = com->rx_message(&msg);
 
     if (received) {
@@ -13,7 +17,9 @@ void node::run()
 
         if (msg.id == BR_ENTRY_NOTICE) {
             Rx_Entry();
-        } else if (msg.id > 10) {
+        } else if (msg.id == TX_SPOT_INFO) {
+            Rx_SpotInfo(&msg);
+        } else if (msg.id > 20) {
             Rx_Prio(&msg);
         }
     }
@@ -32,14 +38,19 @@ void node::updateReservations()
   if (reservationState == reservationSystemState::negotiating) {
     if ((millis() - lastInput) > NEGOTIATION_TIME) {
         reservationState = reservationSystemState::done;
-        Serial.printf("NODE: Negotiation over at %d, last input at %d", millis(), lastInput);
+        Serial.printf("NODE: Negotiation over at %d, last input at %d\n", millis(), lastInput);
     }
   } else if (reservationState == reservationSystemState::done) {
+    for (uint8_t i = 0; i < SPOTS; i++) {
+        if (spots[i].getState() == spotState::Reserved) {
+            spots[i].setReservation(true, (spots[i].getReservationLevel() + 1));
+        }
+    }
     if (lowestNodePriority == ownPriority) {
       for (uint8_t i = 0; i < SPOTS; i++) {
         if (spots[i].getPriority() == lowestNodePriority) {
             Serial.printf("NODE: Won!, reserving spot %d\n", spots[i].getId());
-            spots[i].setReservation(true);
+            spots[i].setReservation(true, 1);
         }
       }
     }
@@ -53,13 +64,13 @@ void node::updateReservations()
 void node::Tx_Prio(uint16_t prio)
 {
     message_frame msg {
-        .id = (10 + ID),
+        .id = (20 + ID),
         .data_length = 2
     };
     msg.data[0] = (prio & 0b11111111);
     msg.data[1] = ((prio >> 8) & 0b11111111);
 
-    Serial.printf("NODE: Sending priority: %d\n", prio);
+    Serial.printf("NODE: Sending priority: %d on id %d\n", prio, msg.id);
 
     com->tx_message(msg);
 }
@@ -101,11 +112,28 @@ void node::Rx_Prio(message_frame* msg)
         prio |= msg->data[0];
         prio |= (msg->data[1] << 8);
 
+        Serial.printf("Receiving priority %d\n", prio);
+
         if (prio < lowestNodePriority) lowestNodePriority = prio;
 
         lastInput = millis();
     }
 
+}
+
+void node::Rx_SpotInfo(message_frame* msg)
+{
+    if (!(msg->data[0] >> 7)) return;
+
+    for (uint8_t i = 0; i < SPOTS; i++) {
+        if (spots[i].getState() == spotState::Reserved) {
+            if (spots[i].getReservationLevel() > 1) {
+                spots[i].setReservation(true, (spots[i].getReservationLevel() - 1));
+            } else {
+                spots[i].setReservation(false, 0);
+            }
+        }
+    }
 }
 
 spotInfo node::getBestSpot()
@@ -118,7 +146,7 @@ spotInfo node::getBestSpot()
 
     for (uint8_t i = 0; i < SPOTS; i++) {
         if (spots[i].getPriority() < lowestPriority) {
-            if (!spots[i].getOccupancy()) {
+            if (spots[i].getState() == spotState::Free) {
                 lowestPriority = spots[i].getPriority();
                 spot.prio = lowestPriority;
                 spot.id = spots[i].getId();
