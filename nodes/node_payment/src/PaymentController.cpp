@@ -20,27 +20,27 @@ void PaymentController::Run()
     }
 
     struct can_frame txMsg;
+    u_int16_t parkingID = dbClient.requestIdByPlate(license.c_str());
 
 
     // Sending parking ID over CAN
-    u_int16_t parkingID = dbClient.requestIdByPlate(license.c_str());
+    Serial.println(license.c_str());
+    Serial.println(parkingID);
     length = sizeof(parkingID);
     // copy raw bytes of parkingID into the CAN frame data
     txMsg.can_id = TX_VALIDATION;
-    txMsg.can_dlc = length;
-    // can_frame.data is an array, copy bytes into it
-    memcpy(txMsg.data, &parkingID, length);
+    txMsg.can_dlc = 2;
+    txMsg.data[0] = parkingID;
     canBus->sendMessage(&txMsg);
 
 
 
 
     // Sending licence plate over CAN
-    length = license.length();
     if (length > 8) length = 8; // ensure fits in CAN data field
     txMsg.can_id = TX_VALIDATED_REG;
-    txMsg.can_dlc = length;
-    memcpy(txMsg.data, license.c_str(), length);
+    txMsg.can_dlc = 2;
+    txMsg.data[0] = license.toInt();
     canBus->sendMessage(&txMsg);
 
     delay(10);
